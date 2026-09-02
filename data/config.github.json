@@ -1,15 +1,14 @@
 {
   "ai": {
-    "provider": "deepseek",
-    "model": "deepseek-v4-flash",
-    "base_url": "https://api.deepseek.com",
-    "api_key_env": "DEEPSEEK_API_KEY",
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key_env": "GOOGLE_API_KEY",
     "temperature": 0.3,
-    "max_tokens": 8192,
-    "throttle_sec": 1,
-    "languages": [ "zh" ],
-    "analysis_concurrency": 5,
-    "enrichment_concurrency": 5
+    "max_tokens": 4096,
+    "throttle_sec": 0,
+    "languages": ["zh"],
+    "analysis_concurrency": 1,
+    "enrichment_concurrency": 1
   },
   "processing": {
     "profiles_dir": "profiles",
@@ -205,11 +204,7 @@
   },
   "digest": {
     "max_items": null,
-    "profile_order": [
-      "tech-news",
-      "tech-blog",
-      "finance-news"
-    ],
+    "profile_order": ["tech-news", "tech-blog", "finance-news"],
     "category_groups": {},
     "default_group": "other",
     "default_group_limit": null
