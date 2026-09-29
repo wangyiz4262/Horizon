@@ -2,9 +2,9 @@ name: Daily Horizon Summary
 
 on:
   schedule:
-    # GitHub scheduled workflows use UTC. 22:00 UTC is 18:00 Eastern Time (6PM);
+    # GitHub scheduled workflows use UTC. 12:00 UTC is 08:00 Eastern Time (8AM);
     # this intentionally runs early or on time depending on observed schedule delay.
-    - cron: '0 22 * * *'
+    - cron: '0 12 * * *'
   workflow_dispatch:      # Allow manual trigger
 
 jobs:
