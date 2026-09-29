@@ -2,8 +2,9 @@ name: Deploy Docs
 
 on:
   push:
-    branches: [main]
+    branches: [custom-config]
     paths: ['docs/**']
+  workflow_dispatch:
 
 jobs:
   deploy:
