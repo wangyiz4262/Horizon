@@ -25,6 +25,14 @@
       "finance-news": {
         "threshold": 7.0,
         "topic_dedup": true
+      },
+      "language-learning": {
+        "threshold": 7.0,
+        "topic_dedup": true
+      },
+      "science-news": {
+        "threshold": 7.0,
+        "topic_dedup": true
       }
     }
   },
@@ -32,21 +40,6 @@
     "icon_style": "emoji"
   },
   "sources": {
-    "github": [
-      {
-        "type": "user_events",
-        "username": "torvalds",
-        "enabled": true,
-        "profile": "tech-news"
-      },
-      {
-        "type": "repo_releases",
-        "owner": "astral-sh",
-        "repo": "uv",
-        "enabled": true,
-        "profile": "tech-news"
-      }
-    ],
     "hackernews": {
       "enabled": true,
       "fetch_top_stories": 20,
@@ -55,27 +48,18 @@
     },
     "rss": [
       {
-        "name": "Simon Willison",
-        "url": "https://simonwillison.net/atom/everything/",
-        "enabled": true,
-        "category": "ai-tools",
-        "profile": "tech-news"
-      },
-      {
-        "name": "vLLM Blog",
-        "url": "https://vllm.ai/blog/rss.xml",
-        "enabled": true,
-        "category": "llm-inference",
-        "profile": "tech-blog",
-        "content_extractor": "trafilatura"
-      },
-      {
         "name": "Sean Goedecke",
         "url": "https://www.seangoedecke.com/rss.xml",
         "enabled": true,
         "category": "software-engineering",
         "profile": "tech-blog",
         "content_extractor": "trafilatura"
+      },
+      {
+        "name": "The Pragmatic Engineer",
+        "url": "https://newsletter.pragmaticengineer.com/feed",
+        "enabled": true,
+        "profile": "tech-blog"
       },
       {
         "name": "CNBC Finance",
@@ -93,18 +77,34 @@
         "profile": "tech-news"
       },
       {
-        "name": "Semianalysis",
-        "url": "https://newsletter.semianalysis.com/feed",
+        "name": "新智元",
+        "url": "https://wechat2rss.xlab.app/feed/ede30346413ea70dbef5d485ea5cbb95cca446e7.xml",
         "enabled": true,
-        "category": "semiconductors",
         "profile": "tech-news"
       },
       {
-        "name": "LWN.net (subscriber full-text)",
-        "url": "https://lwn.net/headlines/full_text?key=${LWN_KEY}",
-        "enabled": false,
-        "category": "linux",
+        "name": "AI Weekly",
+        "url": "https://aiweekly.co/issues.rss",
+        "enabled": true,
         "profile": "tech-news"
+      },
+      {
+        "name": "Latent Space",
+        "url": "https://www.latent.space/feed",
+        "enabled": true,
+        "profile": "tech-news"
+      },
+      {
+        "name": "BBC Learning English",
+        "url": "http://www.bbc.co.uk/learningenglish/english/features/6-minute-english/rss",
+        "enabled": true,
+        "profile": "language-learning"
+      },
+      {
+        "name": "Nature",
+        "url": "https://www.nature.com/nature.rss",
+        "enabled": true,
+        "profile": "science-news"
       }
     ],
     "reddit": {
@@ -118,6 +118,14 @@
           "fetch_limit": 15,
           "min_score": 50,
           "profile": "tech-news"
+        },
+        {
+          "subreddit": "ChatGPT",
+          "enabled": true,
+          "sort": "hot",
+          "time_filter": "day",
+          "fetch_limit": 15,
+          "min_score": 60
         }
       ],
       "users": [
@@ -167,7 +175,7 @@
       "profile": "tech-news"
     },
     "telegram": {
-      "enabled": true,
+      "enabled": false,
       "channels": [
         {
           "channel": "zaihuapd",
@@ -204,7 +212,13 @@
   },
   "digest": {
     "max_items": null,
-    "profile_order": ["tech-news", "tech-blog", "finance-news"],
+    "profile_order": [
+      "tech-news",
+      "tech-blog",
+      "finance-news",
+      "language-learning",
+      "science-news"
+    ],
     "category_groups": {},
     "default_group": "other",
     "default_group_limit": null
