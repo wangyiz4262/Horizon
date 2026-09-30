@@ -2,16 +2,31 @@ name: Daily Horizon Summary
 
 on:
   schedule:
-    # GitHub scheduled workflows use UTC. 12:00 UTC is 08:00 Eastern Time (8AM);
-    # this intentionally runs early or on time depending on observed schedule delay.
-    - cron: '0 12 * * *'
-  workflow_dispatch:      # Allow manual trigger
+    # GitHub only runs `schedule` on the default branch, and treats it as
+    # best-effort: slots are regularly delayed by minutes to hours and can be
+    # dropped, with the worst delays right on the hour. So the primary slot sits
+    # off the hour, slightly ahead of 08:00 ET, and a catch-up slot follows it in
+    # case the primary was delayed or dropped. The guard step below turns the
+    # catch-up into a no-op once a digest has gone out, so the two cannot
+    # double-post.
+    #
+    # Cron is UTC and does not follow DST: the slots below target 08:00 ET during
+    # EDT. When EST starts, shift both an hour later ('40 12 * * *' / '20 16 * * *').
+    - cron: '40 11 * * *'   # 07:40 ET (EDT) target 08:00 ET
+    - cron: '20 15 * * *'   # 11:20 ET (EDT) catch-up after a delayed/dropped primary
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Deliver even if today's briefing was already sent"
+        type: boolean
+        default: false
 
 jobs:
   daily-summary:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Needed to commit changes
+      actions: read    # Needed by the duplicate-delivery guard
 
     steps:
       - name: Checkout code
@@ -33,14 +48,24 @@ jobs:
       - name: Prepare GitHub Actions config
         run: cp data/config.github.json data/config.json
 
+      - name: Check whether today's briefing was already delivered
+        id: guard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE: ${{ inputs.force }}
+        run: python .github/scripts/delivery_guard.py
+
       - name: Resolve and Manage Discord Thread
         id: discord-thread
+        if: steps.guard.outputs.skip != 'true'
+        continue-on-error: true  # a Discord outage must not block the briefing
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
         run: python .github/scripts/manage_discord_threads.py
 
       - name: Run Horizon
+        if: steps.guard.outputs.skip != 'true'
         env:
           # Map secrets to environment variables expected by config.json
           # Modify these based on your data/config.github.json provider settings
@@ -49,13 +74,25 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           LWN_KEY: ${{ secrets.LWN_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          HORIZON_WEBHOOK_URL: ${{ secrets.HORIZON_WEBHOOK_URL }}?thread_id=${{ steps.discord-thread.outputs.thread_id }}
-        run: uv run horizon --hours 24
+          HORIZON_WEBHOOK_URL: ${{ secrets.HORIZON_WEBHOOK_URL }}
+          DISCORD_THREAD_ID: ${{ steps.discord-thread.outputs.thread_id }}
+        run: |
+          # Discord only accepts ?thread_id= when there is a thread to post into;
+          # an empty value is rejected, so fall back to the channel root when the
+          # thread step above failed.
+          if [ -n "$DISCORD_THREAD_ID" ]; then
+            export HORIZON_WEBHOOK_URL="${HORIZON_WEBHOOK_URL}?thread_id=${DISCORD_THREAD_ID}"
+          else
+            echo "No Discord thread resolved; posting to the channel root."
+          fi
+          uv run horizon --hours 24
 
       - name: Set current date as environment variable
+        if: steps.guard.outputs.skip != 'true'
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Deploy to GitHub Pages
+        if: steps.guard.outputs.skip != 'true'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
