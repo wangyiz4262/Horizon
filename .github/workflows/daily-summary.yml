@@ -1,19 +1,9 @@
 name: Daily Horizon Summary
 
 on:
-  schedule:
-    # GitHub only runs `schedule` on the default branch, and treats it as
-    # best-effort: slots are regularly delayed by minutes to hours and can be
-    # dropped, with the worst delays right on the hour. So the primary slot sits
-    # off the hour, slightly ahead of 08:00 ET, and a catch-up slot follows it in
-    # case the primary was delayed or dropped. The guard step below turns the
-    # catch-up into a no-op once a digest has gone out, so the two cannot
-    # double-post.
-    #
-    # Cron is UTC and does not follow DST: the slots below target 08:00 ET during
-    # EDT. When EST starts, shift both an hour later ('40 12 * * *' / '20 16 * * *').
-    - cron: '40 11 * * *'   # 07:40 ET (EDT) target 08:00 ET
-    - cron: '20 15 * * *'   # 11:20 ET (EDT) catch-up after a delayed/dropped primary
+  # Triggered from the host's crontab via `gh workflow run`, not by GitHub's
+  # own `schedule` event. GitHub's scheduler is best-effort (slots are delayed
+  # by minutes to hours and can be dropped), so scheduling lives on the host.
   workflow_dispatch:
     inputs:
       force:

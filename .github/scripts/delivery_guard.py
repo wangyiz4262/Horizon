@@ -1,10 +1,10 @@
 """Skip a run when today's Horizon briefing has already been delivered.
 
-The workflow declares a primary schedule slot plus a catch-up slot, because
-GitHub's ``schedule`` event is best-effort: slots are regularly delayed by
-hours and can be dropped entirely. This guard makes the redundant slots safe to
-keep. A run exits early when another run of this workflow already delivered
-(``conclusion == "success"``) or is still in flight for the current UTC day.
+The workflow is triggered externally — from the host's crontab via ``gh
+workflow run``, and manually. Because those triggers can overlap (a retried
+cron dispatch, a manual re-trigger, or GitHub's own delayed queue), a run exits
+early when another run of this workflow already delivered (``conclusion ==
+"success"``) or is still in flight for the current UTC day.
 
 A manual ``workflow_dispatch`` run bypasses the check with ``force: true``.
 
