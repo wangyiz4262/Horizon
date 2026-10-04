@@ -5,7 +5,7 @@
 
 📡 Your own AI-powered news radar. Generates daily briefings in English & Chinese. | 构建你专属的 AI 新闻雷达
 
-[📖 Live Demo](https://horizon.pages.wangyizhe.net/) · [📋 Configuration Guide](https://thysrael.github.io/Horizon/configuration) · [Docs](https://www.horizon1123.top/)
+[📖 Live Demo](https://news.wangyizhe.net/) · [📋 Configuration Guide](https://thysrael.github.io/Horizon/configuration) · [Docs](https://www.horizon1123.top/)
 
 </div>
 
