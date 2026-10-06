@@ -67,15 +67,31 @@ jobs:
           HORIZON_WEBHOOK_URL: ${{ secrets.HORIZON_WEBHOOK_URL }}
           DISCORD_THREAD_ID: ${{ steps.discord-thread.outputs.thread_id }}
         run: |
-          # Discord only accepts ?thread_id= when there is a thread to post into;
+          # Append query params correctly: the webhook URL may already carry a
+          # query string, and a second "?" makes Discord ignore both params and
+          # silently post to the channel root.
+          sep="?"
+          case "$HORIZON_WEBHOOK_URL" in *\?*) sep="&" ;; esac
+          # wait=true makes Discord return the created message instead of an
+          # empty 204, so a message that was not saved surfaces as an error.
+          export HORIZON_WEBHOOK_URL="${HORIZON_WEBHOOK_URL}${sep}wait=true"
+          # Discord only accepts thread_id when there is a thread to post into;
           # an empty value is rejected, so fall back to the channel root when the
           # thread step above failed.
           if [ -n "$DISCORD_THREAD_ID" ]; then
-            export HORIZON_WEBHOOK_URL="${HORIZON_WEBHOOK_URL}?thread_id=${DISCORD_THREAD_ID}"
+            export HORIZON_WEBHOOK_URL="${HORIZON_WEBHOOK_URL}&thread_id=${DISCORD_THREAD_ID}"
           else
             echo "No Discord thread resolved; posting to the channel root."
           fi
-          uv run horizon --hours 24
+
+          # Horizon logs webhook failures but still exits 0, so fail the job
+          # when any delivery did not succeed.
+          set -o pipefail
+          uv run horizon --hours 24 2>&1 | tee /tmp/horizon.log
+          if grep -qE "Webhook (client error|server error|unexpected status|response failed|connection failed|request timed out|call failed|URL is empty|URL is invalid|received redirect)" /tmp/horizon.log; then
+            echo "::error::Horizon completed but at least one webhook delivery failed; see the warnings above."
+            exit 1
+          fi
 
       - name: Set current date as environment variable
         if: steps.guard.outputs.skip != 'true'
