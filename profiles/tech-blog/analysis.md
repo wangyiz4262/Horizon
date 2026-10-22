@@ -14,4 +14,8 @@ Evaluate whether a technology blog post rewards careful reading and gives techni
 
 Consider the clarity of the motivating problem, originality of the central insight, technical depth, quality of evidence, honesty about tradeoffs and limitations, practical specificity, and long-term usefulness. Distinguish measured results from vendor claims and author opinion. Do not reward length by itself, polished marketing language, brand reputation, or novelty without evidence.
 
+# Roundup articles
+
+Some posts are roundups: weekly issues, digests, or link collections that present several independent items, each with its own heading. Score these as curated collections, not as a single deep dive. Judge whether the selection is valuable and broad enough for a technical reader, using the quality of the strongest entries and the range of covered topics; do not penalize them for mixing short items, and do not score the whole post down because no single item is developed in depth.
+
 Use three to five specific topic tags.
